@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import InputForm from '../../components/InputForm/InputForm';
 import Post from '../../components/Post/Post';
+import './Messages.css';
 
 interface Props {
   author: string;
@@ -14,7 +15,7 @@ const Messages: React.FC = () => {
   const [author, setAuthor] = useState('');
   const [text, setText] = useState('');
   const [data, setData] = useState('');
-
+  const [loading, setLoading] = useState(true);
 
   const url  = 'http://146.185.154.90:8000/messages';
 
@@ -28,10 +29,12 @@ const Messages: React.FC = () => {
         setMessages(fetchedMessages);
         if (fetchedMessages.length > 0) {
           setData(fetchedMessages[fetchedMessages.length - 1].datetime);
+          setLoading(false);
         }
       }
     } catch (error) {
       console.error('Ошибка при получении сообщений:', error);
+      setLoading(false);
     }
   };
 
@@ -83,23 +86,29 @@ const Messages: React.FC = () => {
 
   return (
     <div className="inner-container">
-      <InputForm
-        setAuthor={setAuthor}
-        setText={setText}
-        add={addMessage}
-        author={author}
-        text={text}
-      />
-      <div className="posts">
-        {messages.map((post) => (
-          <Post
-            key={post._id}
-            author={post.author}
-            date={formatDate(post.datetime)}
-            text={post.message}
+      {loading ? (
+        <div className="loader"></div>
+      ) : (
+        <>
+          <InputForm
+            setAuthor={setAuthor}
+            setText={setText}
+            add={addMessage}
+            author={author}
+            text={text}
           />
-        ))}
-      </div>
+          <div className="posts">
+            {messages.map((post) => (
+              <Post
+                key={post._id}
+                author={post.author}
+                date={formatDate(post.datetime)}
+                text={post.message}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
