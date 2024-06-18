@@ -1,0 +1,23 @@
+.post {
+  border: 2px solid black;
+  border-radius: 10px;
+  margin: 10px 53px;
+  text-align: left;
+  padding: 0 15px;
+}
+.postAuthor {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+.postInfo {
+  margin-top: 6px;
+  font-size: 14px;
+  color: grey;
+  margin-bottom: 0;
+}
+
+.postText {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
