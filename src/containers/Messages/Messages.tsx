@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import InputForm from '../../components/InputForm/InputForm';
 import Post from '../../components/Post/Post';
 
 interface Props {
@@ -10,6 +11,8 @@ interface Props {
 
 const Messages: React.FC = () => {
   const [messages, setMessages] = useState<Props[]>([]);
+  const [author, setAuthor] = useState('');
+  const [text, setText] = useState('');
   const [data, setData] = useState('');
 
 
@@ -32,26 +35,67 @@ const Messages: React.FC = () => {
     }
   };
 
+  const addMessage = async () => {
+    const data = new URLSearchParams();
+    data.set('message', text);
+    data.set('author', author);
+
+    if (interval) clearInterval(interval);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: data,
+      });
+      if (response.ok) {
+        await fetchMessages();
+      }
+    } catch (error) {
+      console.error('Ошибка при отправке сообщения:', error);
+    }
+
+    interval = setInterval(fetchMessages, 3000);
+
+    setAuthor('');
+    setText('');
+  };
 
   useEffect(() => {
     void fetchMessages();
 
-    interval = setInterval(fetchMessages, 2000);
+    interval = setInterval(fetchMessages, 3000);
 
     return () => {
       if (interval) clearInterval(interval);
     };
   }, []);
 
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const pad = (s: number): string => (s < 10 ? '0' + s : s.toString());
+    return [pad(date.getMonth() + 1),
+        pad(date.getDate()),
+        date.getFullYear()].join('.') + ' ' +
+      [pad(date.getHours()),
+        pad(date.getMinutes()),
+        pad(date.getSeconds())].join(':');
+  };
 
   return (
     <div className="inner-container">
+      <InputForm
+        setAuthor={setAuthor}
+        setText={setText}
+        add={addMessage}
+        author={author}
+        text={text}
+      />
       <div className="posts">
         {messages.map((post) => (
           <Post
             key={post._id}
             author={post.author}
-            date={(post.datetime)}
+            date={formatDate(post.datetime)}
             text={post.message}
           />
         ))}
